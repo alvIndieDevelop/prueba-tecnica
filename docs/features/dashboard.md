@@ -1,10 +1,10 @@
 # Dashboard
 
-Estado: pendiente.
+Estado: implementado. Endpoint y protección server-side verificados; UI conectada con carga, error y reintento.
 
 ## Objetivo y prioridad
 
-P0: mostrar al menos dos tarjetas con métricas reales del backend en página protegida. P2: mostrar usuario conectado en header y pulir presentación.
+P0: mostrar al menos dos tarjetas con métricas reales del backend en página protegida. La UI muestra total, activos e inactivos. P2: mostrar usuario conectado y pulir presentación.
 
 ## Comportamiento, endpoint y datos
 

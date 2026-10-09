@@ -1,6 +1,6 @@
 # Arquitectura prevista
 
-Monolito Next.js App Router con TypeScript: UI sencilla con Tailwind, Route Handlers en runtime Node.js y SQLite local mediante `better-sqlite3`. Sin servicios externos, Docker ni abstracciones adicionales. `bcryptjs` permite guardar solo hashes de contraseñas. Ninguna carpeta de aplicación descrita aquí existe todavía.
+Monolito Next.js App Router con TypeScript: UI sencilla con Tailwind, Route Handlers en runtime Node.js y SQLite local mediante `better-sqlite3`. Sin servicios externos, Docker ni abstracciones adicionales. `bcryptjs` permite guardar solo hashes de contraseñas. SQLite, seed, autenticación, endpoints y UI están conectados.
 
 ## Estructura y responsabilidades previstas
 
@@ -37,10 +37,10 @@ La UI consume endpoints para métricas y usuarios; el dashboard comprueba la ses
 | `GET /api/auth/me` | Cookie | 200 `{user:{id,name,email,role,status}}` | 401 sin sesión válida; 500 inesperado |
 | `POST /api/auth/logout` (P1) | Cookie | 204 sin cuerpo y cookie borrada, incluso si falta sesión | 500 inesperado |
 | `GET /api/metrics` | Cookie | 200 `{totalUsers,activeUsers}` | 401 sin sesión válida; 500 inesperado |
-| `GET /api/users?q=...` | Cookie; `q` opcional | 200 `{users:[{id,name,email,role,status}],total}` | 400 parámetros inválidos; 401 sin sesión válida; 500 inesperado |
+| `GET /api/users?q=...&role=...&status=...&page=...&limit=...` | Cookie; filtros y paginación opcionales | 200 `{users,total,page,limit,totalPages}` | 400 parámetros inválidos; 401 sin sesión válida; 500 inesperado |
 
-`GET /api/users` buscará por nombre o email con SQL parametrizado (también los patrones de búsqueda), sin interpolar entrada en la consulta. `total` cuenta los resultados de la búsqueda, no solo los mostrados. `page`/`limit` y paginación son P1.
+`GET /api/users` busca por nombre o email y filtra por `admin|member` y `active|inactive` con SQL parametrizado, sin interpolar entrada. `total` cuenta el resultado combinado antes de aplicar `LIMIT/OFFSET`; `page` empieza en 1 y `limit` acepta 10, 20 o 50.
 
 ## Datos iniciales y configuración
 
-Seed reproducible e idempotente con al menos dos usuarios de distinto estado. Cuenta de prueba prevista: `demo@devpanel.local` / `Devpanel123!`; generar su hash al ejecutar el seed, nunca guardar la contraseña en la DB. Métricas reales mediante `COUNT(*)` sobre `users` y `COUNT(*)` de usuarios activos, no JSON fijo. Única variable prevista: `DATABASE_PATH=./data/devpanel.sqlite`. Token aleatorio, sin secreto estático ni variable de firma. Comandos exactos, versiones y duración concreta de sesión: pendientes de implementación y validación.
+Seed reproducible e idempotente con 203 usuarios de distinto rol y estado. Cuenta de prueba: `demo@devpanel.local` / `Devpanel123!`; genera hashes bcrypt al ejecutar el seed y nunca guarda contraseñas en texto plano. Métricas reales mediante `COUNT(*)` sobre `users` y `COUNT(*)` de usuarios activos, no JSON fijo. Variables server-only: `DATABASE_PATH=./data/devpanel.sqlite` y `SESSION_DURATION_SECONDS=604800`. Token aleatorio, sin secreto estático ni variable de firma. Ejecutar el seed con `npm run seed`.

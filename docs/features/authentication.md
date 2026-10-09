@@ -1,6 +1,6 @@
 # Autenticación
 
-Estado: pendiente.
+Estado: implementado. Backend y redirecciones server-side verificados; formulario, logout y manejo cliente de 401 conectados.
 
 ## Objetivo y prioridades
 

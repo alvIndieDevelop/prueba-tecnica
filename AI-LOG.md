@@ -1,6 +1,6 @@
 # Bitácora de IA: DevPanel
 
-Herramienta: Kilo Code. Modelo conocido: `openai/gpt-6-sol`. No hay código de aplicación todavía.
+Herramienta: Kilo Code. Modelo conocido al iniciar la bitácora: `openai/gpt-6-sol`.
 
 ## Primer prompt del usuario (transcripción literal)
 
@@ -241,3 +241,54 @@ Aplicar esta política también en AGENTS.md y en el plan de implementación.
 - Respuestas de IA rechazadas o modificadas y motivos: pendiente; ninguna registrada con evidencia.
 - Porcentaje final de código IA/humano: pendiente; todavía no hay código de aplicación.
 - Algo que la IA hizo bien y algo que hizo mal: pendiente de evaluación con resultados verificables.
+
+## Estructura inicial (2026-10-09)
+
+- Prompt: `lets start creating the structure, with the necesaries component to build this project`.
+- Acción: se creó el scaffold explícito de Next.js 16 App Router, TypeScript estricto, Tailwind CSS 4 y ESLint sin sobrescribir la documentación existente. Se instalaron dependencias de aplicación y desarrollo y se aprobaron únicamente los scripts nativos necesarios de `better-sqlite3`, `unrs-resolver` y `esbuild`.
+- Componentes: marca, formulario de login deshabilitado, sidebar, tarjetas de métricas y tabla vacía; páginas `/login` y `/dashboard`; tipos públicos y puntos de entrada pendientes para DB, auth y seed. No se simularon datos ni autenticación.
+- Resultado verificado: lint correcto, carga de `better-sqlite3` correcta, build correcto y respuestas HTTP 200 de ambas páginas en servidor de desarrollo.
+- Corrección aplicada: `npm audit fix` actualizó dependencias de producción. Quedaron cinco avisos altos transitivos de la herramienta ESLint; no se aplicó `--force` porque npm proponía una degradación incompatible de `eslint-config-next`.
+
+## Backend (2026-10-09)
+
+- Prompt: `ok, now lets work with the backend first, to have the project just ready in the backend and then just work the visuals.`
+- Decisión: completar y verificar P0 backend antes de logout P1; sesión opaca de siete días, SHA-256 del token en SQLite y cookie `HttpOnly`, `SameSite=Lax`, `Secure` en producción.
+- Acción: esquema e índices SQLite, seed idempotente con bcrypt, repositorios tipados, login, sesión actual, métricas, búsqueda parametrizada de usuarios y protección server-side del dashboard. Tras verificar P0 se añadió logout idempotente.
+- Resultado manual: seed repetido mantuvo tres usuarios; códigos 400/401/200/204 según contrato; sesión persistió tras reinicio; métricas 3/2; búsqueda literal y por nombre correctas; logout y expiración invalidaron acceso. Ninguna respuesta expuso hashes ni tokens.
+- Validación final: lint y build correctos; cinco handlers dinámicos generados; auditoría de dependencias de producción con cero vulnerabilidades.
+- Corrección: el primer intento de levantar una segunda instancia falló por un proceso Next.js detectado; no se mató el proceso ajeno y se reintentó tras comprobar que había terminado. También se ajustó JSON malformado de login para devolver 400 y se marcó la ruta dinámica de SQLite como intencional para eliminar la advertencia de Turbopack.
+
+## Integración de interfaz (2026-10-09)
+
+- Prompt: `lets go.` en respuesta al siguiente paso propuesto de conectar la interfaz al backend.
+- Acción: formulario de login funcional con error y carga; identidad server-side y logout; métricas con skeleton/error/reintento; tabla real con estados de carga, error y vacío; búsqueda con debounce de 300 ms y cancelación de solicitudes anteriores; redirección al login ante 401.
+- Resultado verificado: lint sin advertencias, build correcto y flujo HTTP integrado correcto para acceso anónimo, login, dashboard autenticado, redirección de login con sesión y logout.
+- Corrección: ESLint rechazó `window.location.assign` para rutas internas; se sustituyó por `router.replace` y `router.refresh` de App Router.
+- Limitación real: no había herramienta de interacción visual en navegador. Se verificaron HTML server-side, rutas y build, pero la observación interactiva del debounce permanece pendiente; no se instalaron frameworks de testing por la política del proyecto.
+
+## Filtros de usuarios (2026-10-09)
+
+- Prompt: `now lets add the filter on the table.`
+- Acción: filtros combinables por rol y estado en UI y `GET /api/users`, con validación estricta y condiciones SQL parametrizadas. Se añadió acción para limpiar búsqueda y filtros.
+- Resultado: lint y build correctos. Verificación HTTP: `member` devolvió 2 usuarios, `inactive` 1, `member + active` 1, búsqueda más filtro 0 y rol inválido 400.
+- Pendiente: comprobar visualmente los selects y su adaptación móvil junto con la revisión interactiva ya pendiente.
+
+## Configuración de entorno (2026-10-09)
+
+- Prompt: `now lets create the .env, i saw some variables that can be on the env.`
+- Acción: se completaron `.env` y `.env.example` con la ruta SQLite y duración de sesión. `SESSION_DURATION_SECONDS` se lee solo en servidor y se valida como entero positivo.
+- Decisión: no añadir un secreto de sesión estático porque el diseño genera tokens opacos mediante CSPRNG y guarda únicamente su hash.
+
+## Corrección de prueba de expiración (2026-10-09)
+
+- Prompt: el usuario reportó que seguía autenticado tras configurar una expiración de 30 segundos.
+- Diagnóstico: `.env` todavía contenía `604800` y las sesiones almacenadas vencían siete días después; cambiar la duración no altera sesiones ya creadas.
+- Acción: se estableció `SESSION_DURATION_SECONDS=30` en el entorno local, se reinició el servidor y se creó una sesión nueva aislada.
+- Resultado real: la sesión se almacenó con 30 segundos restantes, `/api/auth/me` respondió 200 inmediatamente y 401 tras 35 segundos; `/dashboard` respondió 307 hacia `/login`.
+
+## Dataset y paginación (2026-10-09)
+
+- Prompt: `now lets modify the visual a little. just to have more, and also add more users, put al least 200 user, and pagination on the table.`
+- Acción: seed determinista ampliado a 203 usuarios; paginación SQL con conteo, límites 10/20/50 y ajuste de página; controles anterior/siguiente; tercera métrica de inactivos, saludo personalizado y mejoras visuales de tabla.
+- Resultado: seed repetido mantuvo 203 usuarios, con 162 activos, 41 inactivos y 23 administradores. La API devolvió 21 páginas de diez, tres registros en la última, filtros paginados y 400 para paginación inválida.

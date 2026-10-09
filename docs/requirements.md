@@ -1,6 +1,6 @@
 # Requisitos de DevPanel
 
-Estado de implementación y verificación: pendiente. Esta especificación expresa objetivos, no funcionamiento demostrado.
+Estado: P0 y logout P1 implementados. Backend, navegación server-side, lint y build verificados; observación interactiva del debounce en navegador pendiente.
 
 ## P0: obligatorio
 
@@ -13,14 +13,14 @@ Estado de implementación y verificación: pendiente. Esta especificación expre
 
 ## P1: después de verificar P0
 
-- Paginación o scroll infinito.
+- Paginación o scroll infinito (paginación implementada).
 - Logout.
 - Manejo de 401 para redirigir al login cuando la sesión vence.
 
 ## P2: opcional
 
 - Usuario conectado visible en el header.
-- Filtros por rol o estado.
+- Filtros por rol o estado (implementados).
 - Mayor pulido visual.
 
 ## Restricciones

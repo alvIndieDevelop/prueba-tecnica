@@ -1,0 +1,20 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# local data and environment
+/data/*.sqlite
+/data/*.sqlite-*
+.env*
+!.env.example
+
+# logs and tooling
+npm-debug.log*
+*.tsbuildinfo
+next-env.d.ts
