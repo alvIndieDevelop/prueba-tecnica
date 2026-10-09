@@ -292,3 +292,8 @@ Aplicar esta política también en AGENTS.md y en el plan de implementación.
 - Prompt: `now lets modify the visual a little. just to have more, and also add more users, put al least 200 user, and pagination on the table.`
 - Acción: seed determinista ampliado a 203 usuarios; paginación SQL con conteo, límites 10/20/50 y ajuste de página; controles anterior/siguiente; tercera métrica de inactivos, saludo personalizado y mejoras visuales de tabla.
 - Resultado: seed repetido mantuvo 203 usuarios, con 162 activos, 41 inactivos y 23 administradores. La API devolvió 21 páginas de diez, tres registros en la última, filtros paginados y 400 para paginación inválida.
+
+## Instrucciones de ejecución (2026-10-09)
+
+- Prompt: `now modify the readme, to have the instruccions to.`
+- Acción: se amplió el README con prerrequisitos, clonación, instalación, configuración de entorno, seed, desarrollo, producción local, comandos disponibles y comportamiento de cambios en la duración de sesión.
